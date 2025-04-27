@@ -4,7 +4,6 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import CanvasLoader from './components/canvas-loader'
 import Earth from './components/planets/earth'
 import { Sun } from './components/planets/sun'
-import { Html } from '@react-three/drei'
 
 function App() {
     return (
@@ -18,9 +17,6 @@ function App() {
 
                 <Sun scale={0.002} position={[0, 0, 0]} rotation={[0, 0, 0]} />
 
-                <Html>
-                    <div></div>
-                </Html>
                 <Earth scale={1} position={[0, 0, 0]} rotation={[0, 0, 0]} />
 
                 <ambientLight intensity={0.5} />
