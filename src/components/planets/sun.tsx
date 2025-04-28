@@ -1,4 +1,4 @@
-import { useGLTF } from '@react-three/drei'
+import { Html, useGLTF } from '@react-three/drei'
 import { Mesh } from 'three'
 
 type PlanetProps = {
@@ -16,6 +16,9 @@ export const Sun = (props: PlanetProps) => {
             <group rotation={[-2.083, 0.146, 0.212]} scale={4.783}>
                 <mesh castShadow receiveShadow geometry={(nodes.Planeta009_09Sun_0 as Mesh).geometry} material={materials['09.Sun']} />
                 <mesh castShadow receiveShadow geometry={(nodes['Nubes001_09Nubes-atmosfera_-_Sun_0'] as Mesh).geometry} material={materials['09.Nubes-atmosfera_-_Sun']} rotation={[0.047, 0.234, -0.396]} scale={1.013} />
+                <Html className='absolute -bottom-16 -translate-x-1/2 transform'>
+                    <p className='text-gray-300 text-sm font-light tracking-widest'>SUN</p>
+                </Html>
             </group>
         </group>
     )

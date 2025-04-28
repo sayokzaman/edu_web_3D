@@ -1,9 +1,14 @@
 import { useMemo } from 'react'
 import { BufferAttribute, BufferGeometry, EllipseCurve } from 'three'
 
-const Orbit = () => {
-    const semiMajorAxis = 10
-    const semiMinorAxis = 6
+type OrbitProps = {
+    xAxis: number
+    yAxis: number
+}
+
+const Orbit = (props: OrbitProps) => {
+    const semiMajorAxis = props.xAxis
+    const semiMinorAxis = props.yAxis
     const curve = useMemo(() => {
         return new EllipseCurve(
             0,
@@ -15,7 +20,7 @@ const Orbit = () => {
             false, // clockwise
             0 // rotation
         )
-    }, [])
+    }, [semiMajorAxis, semiMinorAxis])
 
     // Create path geometry
     const pathGeometry = useMemo(() => {

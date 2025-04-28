@@ -7,6 +7,8 @@ import { Sun } from './components/planets/sun'
 import Orbit from './components/orbit'
 import { PerspectiveCamera as Camera, Vector3 } from 'three'
 import { CameraController } from './components/camera-controller'
+import { Sky } from './components/planets/sky'
+import Mars from './components/planets/mars'
 
 function App() {
     const cameraRef = useRef<Camera>(null)
@@ -103,8 +105,11 @@ function App() {
                 <CameraController cameraRef={cameraRef} controlsRef={controlsRef} targetPosition={earthPosition} isFollowing={isFollowing} isAnimating={isAnimating} />
 
                 <pointLight position={[0, 0, 0]} intensity={200} />
+
+                <Sky />
+
                 <Sun scale={0.002} position={[0, 0, 0]} rotation={[0, 0, 0]} />
-                <Earth scale={1} position={earthPosition} rotation={earthRotation} onClick={handleEarthClick} onPositionUpdate={updateEarthPosition} isFollowing={isFollowing} />
+                <Earth position={earthPosition} rotation={earthRotation} onClick={handleEarthClick} onPositionUpdate={updateEarthPosition} isFollowing={isFollowing} />
                 {isFollowing ? (
                     <Html
                         position={new Vector3(...earthPosition)}
@@ -126,7 +131,11 @@ function App() {
                     </Html>
                 ) : null}
 
-                <Orbit />
+                <Orbit xAxis={10} yAxis={6} />
+
+                <Mars />
+                <Orbit xAxis={15} yAxis={10} />
+
                 <ambientLight intensity={0.5} />
             </Canvas>
         </div>

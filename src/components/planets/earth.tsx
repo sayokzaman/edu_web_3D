@@ -18,7 +18,7 @@ const Earth = (props: PlanetProps) => {
     const { modelRef, isPaused, setIsPaused } = useOrbit({
         semiMajorAxis: 10,
         semiMinorAxis: 6,
-        speed: 0.2,
+        speed: 0.3,
         pauseOnHover: true
     })
 
@@ -33,7 +33,7 @@ const Earth = (props: PlanetProps) => {
     return (
         <group>
             <group
-                scale={isPaused ? [0.27, 0.27, 0.27] : [0.25, 0.25, 0.25]}
+                scale={isPaused ? [0.42, 0.42, 0.42] : [0.4, 0.4, 0.4]}
                 ref={modelRef}
                 position={props.position}
                 rotation={props.rotation}
