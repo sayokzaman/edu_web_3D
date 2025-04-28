@@ -1,100 +1,70 @@
-import { useGLTF } from '@react-three/drei'
+// components/planets/earth.tsx
+import { Html, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useRef, useMemo, useState, useEffect } from 'react'
-import { Group, Mesh, BufferGeometry, BufferAttribute, EllipseCurve } from 'three'
+import { Mesh } from 'three'
+import { useOrbit } from '../../hooks/useOrbit'
 
 type PlanetProps = {
     scale?: number
     position?: [number, number, number]
     rotation?: [number, number, number]
+    onClick?: () => void
+    onPositionUpdate?: (position: [number, number, number], rotation: [number, number, number]) => void
+    isFollowing?: boolean
 }
 
 const Earth = (props: PlanetProps) => {
     const { nodes, materials } = useGLTF('/models/World.glb')
-    const modelRef = useRef<Group>(null)
-    const accumulatedTime = useRef(0)
-    const lastTime = useRef(0)
-    const [isPaused, setIsPaused] = useState(false)
+    const { modelRef, isPaused, setIsPaused } = useOrbit({
+        semiMajorAxis: 10,
+        semiMinorAxis: 6,
+        speed: 0.2,
+        pauseOnHover: true
+    })
 
-    // Path parameters
-    const semiMajorAxis = 10
-    const semiMinorAxis = 6
-    const curve = useMemo(() => {
-        return new EllipseCurve(
-            0,
-            0, // center
-            semiMajorAxis,
-            semiMinorAxis, // xRadius, yRadius
-            0,
-            Math.PI * 2, // startAngle, endAngle
-            false, // clockwise
-            0 // rotation
-        )
-    }, [])
-
-    // Create path geometry
-    const pathGeometry = useMemo(() => {
-        const points = curve.getPoints(100)
-        const vertices = points.map(point => [point.x, 0, point.y]).flat()
-
-        const geometry = new BufferGeometry()
-        geometry.setAttribute('position', new BufferAttribute(new Float32Array(vertices), 3))
-        return geometry
-    }, [curve])
-
-    // Handle pause state changes
-    useEffect(() => {
-        if (!isPaused) {
-            lastTime.current = performance.now() / 1000
-        }
-    }, [isPaused])
-
-    // Animation loop
-    useFrame(({ clock }) => {
-        const speed = 0.2
-        if (modelRef.current) {
-            modelRef.current.rotation.y = clock.getElapsedTime() * -speed * 2
-        }
-        if (isPaused) return
-
-        const now = performance.now() / 1000
-        if (lastTime.current === 0) {
-            lastTime.current = now
-        }
-
-        const deltaTime = now - lastTime.current
-        lastTime.current = now
-
-        accumulatedTime.current += deltaTime
-
-        // Calculate position on ellipse
-        const x = Math.cos(accumulatedTime.current * speed) * semiMajorAxis
-        const z = Math.sin(accumulatedTime.current * speed) * semiMinorAxis
-
-        // Update position
-        if (modelRef.current) {
-            modelRef.current.position.x = x
-            modelRef.current.position.z = z
+    useFrame(() => {
+        if (modelRef.current && props.onPositionUpdate) {
+            const position = modelRef.current.position
+            const rotation = modelRef.current.rotation
+            props.onPositionUpdate([position.x, position.y, position.z], [rotation.x, rotation.y, rotation.z])
         }
     })
 
     return (
-        <group {...props}>
-            {/* The planet */}
-            <group scale={isPaused ? [0.27, 0.27, 0.27] : [0.25, 0.25, 0.25]} ref={modelRef} onPointerOver={() => setIsPaused(true)} onPointerOut={() => setIsPaused(false)}>
+        <group>
+            <group
+                scale={isPaused ? [0.27, 0.27, 0.27] : [0.25, 0.25, 0.25]}
+                ref={modelRef}
+                position={props.position}
+                rotation={props.rotation}
+                onPointerOver={() => {
+                    if (!props.isFollowing) {
+                        setIsPaused(true)
+                    }
+                }}
+                onPointerOut={() => {
+                    if (!props.isFollowing) {
+                        setIsPaused(false)
+                    }
+                }}
+                onClick={() => {
+                    setIsPaused(true)
+                    props.onClick?.()
+                    setTimeout(() => {
+                        setIsPaused(false)
+                    }, 1000)
+                }}
+            >
                 <mesh castShadow receiveShadow geometry={(nodes['8081earthmap4k'] as Mesh).geometry} material={materials['8081earthmap4k.002']} rotation={[1.569, -1.26, 1.57]} scale={5.099} />
                 <mesh castShadow receiveShadow geometry={(nodes['8081earthmap4k001'] as Mesh).geometry} material={materials['8081earthmap4k.003']} rotation={[1.569, -1.26, 1.57]} scale={5.104} />
+                {!props.isFollowing ? (
+                    <Html className='absolute -bottom-8 -translate-x-1/2 transform'>
+                        <p className='text-gray-300 text-sm font-light tracking-widest'>EARTH</p>
+                    </Html>
+                ) : null}
             </group>
-
-            {/* The path */}
-            <line>
-                <bufferGeometry attach='geometry' {...pathGeometry} />
-                <lineBasicMaterial attach='material' color='#4f4f4f' linewidth={1} />
-            </line>
         </group>
     )
 }
-
-useGLTF.preload('/models/World.glb')
 
 export default Earth
