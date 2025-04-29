@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { Suspense, useRef, useState } from 'react'
-import { Html, OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import CanvasLoader from './components/canvas-loader'
 import Earth from './components/planets/earth'
 import { Sun } from './components/planets/sun'
@@ -9,42 +9,78 @@ import { PerspectiveCamera as Camera, Vector3 } from 'three'
 import { CameraController } from './components/camera-controller'
 import { Sky } from './components/planets/sky'
 import Mars from './components/planets/mars'
+import { Mercury } from './components/planets/mercury'
+import { Jupiter } from './components/planets/jupiter'
+import { Venus } from './components/planets/venus'
+import Saturn from './components/planets/saturn'
 
 function App() {
+    const [planetsPosition, setPlanetsPosition] = useState<{ [key: string]: [number, number, number] }>({
+        sun: [0, 0, 0],
+        mercury: [0, 0, 0],
+        venus: [0, 0, 0],
+        earth: [0, 0, 0],
+        mars: [0, 0, 0],
+        jupiter: [0, 0, 0],
+        saturn: [0, 0, 0]
+    })
+    const [currentPlanet, setCurrentPlanet] = useState<string | null>(null)
+
     const cameraRef = useRef<Camera>(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const controlsRef = useRef<any>(null)
-    const [earthPosition, setEarthPosition] = useState<[number, number, number]>([0, 0, 0])
-    const [earthRotation, setEarthRotation] = useState<[number, number, number]>([0, 0, 0])
     const [isFollowing, setIsFollowing] = useState(false)
     const [isAnimating, setIsAnimating] = useState(false)
-    const defaultCameraPosition: [number, number, number] = [-10, 30, 30]
+    const defaultCameraPosition: [number, number, number] = [-100, 130, 130]
 
-    const handleEarthClick = () => {
-        if (!cameraRef.current || !controlsRef.current || isAnimating || isFollowing) return
+    const handlePlanetClick = (planet: string) => {
+        // Guard clauses
+        if (!cameraRef.current || !controlsRef.current || isAnimating || (isFollowing && currentPlanet === planet)) return
 
+        // Set states
+        setCurrentPlanet(planet)
         setIsFollowing(true)
         setIsAnimating(true)
 
+        // Get positions
         const startPosition = cameraRef.current.position.clone()
-        const earthVec = new Vector3(...earthPosition)
-        const zoomPosition = earthVec.clone().add(new Vector3(0, 1.5, 2))
-        const duration = 1000
+        const planetPos = planetsPosition[planet] || [0, 0, 0]
+        const planetVector = new Vector3(...planetPos)
+
+        // Calculate target position (adjust these values for each planet if needed)
+        let zoomOffset = null
+        if (planet === 'jupiter') {
+            zoomOffset = new Vector3(0, 8, 15)
+        } else if (planet === 'saturn') {
+            zoomOffset = new Vector3(0, 2, 7)
+        } else {
+            zoomOffset = new Vector3(0, 1.3, 3.5)
+        }
+        const zoomPosition = planetVector.clone().add(zoomOffset)
+
+        // Animation setup
+        const duration = 1000 // ms
         const startTime = performance.now()
 
+        // Animation loop
         const animateCamera = (currentTime: number) => {
             const elapsed = currentTime - startTime
             const progress = Math.min(elapsed / duration, 1)
+
+            // Smooth easing function
             const smoothProgress = progress * progress * (3 - 2 * progress)
 
+            // Move camera
             if (cameraRef.current) {
                 cameraRef.current.position.lerpVectors(startPosition, zoomPosition, smoothProgress)
             }
 
+            // Update controls target
             if (controlsRef.current) {
-                controlsRef.current.target.lerp(earthVec, smoothProgress)
+                controlsRef.current.target.lerp(planetVector, smoothProgress)
             }
 
+            // Continue animation or finish
             if (progress < 1) {
                 requestAnimationFrame(animateCamera)
             } else {
@@ -52,6 +88,7 @@ function App() {
             }
         }
 
+        // Start animation
         requestAnimationFrame(animateCamera)
     }
 
@@ -60,6 +97,7 @@ function App() {
 
         setIsFollowing(false)
         setIsAnimating(true)
+        setCurrentPlanet(null)
 
         const startPosition = cameraRef.current.position.clone()
         const defaultVec = new Vector3(...defaultCameraPosition)
@@ -90,54 +128,59 @@ function App() {
         requestAnimationFrame(animateCamera)
     }
 
-    const updateEarthPosition = (position: [number, number, number], rotation: [number, number, number]) => {
-        setEarthPosition(position)
-        setEarthRotation(rotation)
+    const updatePlanetsPosition = (position: [number, number, number], name: string) => {
+        setPlanetsPosition(prev => ({ ...prev, [name]: position }))
     }
 
     return (
         <div className='relative h-screen w-screen bg-gray-900'>
             <Canvas onClick={handleCanvasClick}>
                 <Suspense fallback={<CanvasLoader />} />
-                <PerspectiveCamera makeDefault position={defaultCameraPosition} ref={cameraRef} />
-                <OrbitControls ref={controlsRef} enableZoom enablePan />
 
-                <CameraController cameraRef={cameraRef} controlsRef={controlsRef} targetPosition={earthPosition} isFollowing={isFollowing} isAnimating={isAnimating} />
+                <PerspectiveCamera makeDefault position={[-100, 130, 130]} ref={cameraRef} />
 
-                <pointLight position={[0, 0, 0]} intensity={200} />
+                <CameraController cameraRef={cameraRef} controlsRef={controlsRef} targetPosition={currentPlanet ? planetsPosition[currentPlanet] : defaultCameraPosition} isFollowing={isFollowing} isAnimating={isAnimating} currentPlanet={currentPlanet} />
+
+                <OrbitControls ref={controlsRef} enableZoom enablePan={false} maxDistance={400} />
 
                 <Sky />
 
-                <Sun scale={0.002} position={[0, 0, 0]} rotation={[0, 0, 0]} />
-                <Earth position={earthPosition} rotation={earthRotation} onClick={handleEarthClick} onPositionUpdate={updateEarthPosition} isFollowing={isFollowing} />
-                {isFollowing ? (
-                    <Html
-                        position={new Vector3(...earthPosition)}
-                        center
-                        style={{
-                            transform: 'translateY(120%) translateX(-50%)',
-                            background: 'rgba(0, 0, 0, 0.5)',
-                            color: 'white',
-                            padding: '1rem',
-                            border: '0.5px solid gray',
-                            borderRadius: '15px',
-                            minWidth: '300px',
-                            pointerEvents: 'none'
-                        }}
-                    >
-                        <h3 style={{ margin: 0 }}>Planet Earth</h3>
-                        <p style={{ margin: '0.5rem 0' }}>Diameter: 12,742 km</p>
-                        <p style={{ margin: 0 }}>Population: 8 billion</p>
-                    </Html>
-                ) : null}
+                <Sun scale={0.01} position={[0, 0, 0]} rotation={[0, 0, 0]} />
 
-                <Orbit xAxis={10} yAxis={6} />
+                <>
+                    <Mercury orbitAxis={[15, 15]} position={planetsPosition.mercury} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Orbit xAxis={15} yAxis={15} />
+                </>
 
-                <Mars />
-                <Orbit xAxis={15} yAxis={10} />
+                <>
+                    <Venus orbitAxis={[22, 20]} position={planetsPosition.venus} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Orbit xAxis={22} yAxis={20} />
+                </>
 
-                <ambientLight intensity={0.5} />
+                <>
+                    <Earth orbitAxis={[32, 30]} position={planetsPosition.earth} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Orbit xAxis={32} yAxis={30} />
+                </>
+
+                <>
+                    <Mars orbitAxis={[50, 47]} position={planetsPosition.mars} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Orbit xAxis={50} yAxis={47} />
+                </>
+
+                <>
+                    <Jupiter orbitAxis={[70, 63]} position={planetsPosition.jupiter} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Orbit xAxis={70} yAxis={63} />
+                </>
+
+                <>
+                    <Saturn orbitAxis={[85, 80]} position={planetsPosition.saturn} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Orbit xAxis={85} yAxis={80} />
+                </>
+
+                <ambientLight intensity={0.3} />
+                <pointLight position={[0, 0, 0]} intensity={2000} />
             </Canvas>
+            {/* <div className='absolute top-0 right-0 w-64 bg-white'>asd</div> */}
         </div>
     )
 }

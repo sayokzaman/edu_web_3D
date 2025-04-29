@@ -1,27 +1,42 @@
-import { Html, useGLTF } from '@react-three/drei'
-import { Mesh } from 'three'
+import { useGLTF } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { Bloom, EffectComposer } from '@react-three/postprocessing'
+import { useRef } from 'react'
+import { Group, Mesh } from 'three'
 
-type PlanetProps = {
-    scale?: number
+type Props = {
     position?: [number, number, number]
     rotation?: [number, number, number]
+    scale?: number
 }
 
-export const Sun = (props: PlanetProps) => {
-    const { nodes, materials } = useGLTF('/models/sun.glb')
+export function Sun(props: Props) {
+    const modelRef = useRef<Group>(null)
+    const { nodes, materials } = useGLTF('/models/sun_model.glb')
+
+    useFrame(() => {
+        if (modelRef.current) {
+            modelRef.current.rotation.y += 0.0005
+        }
+    })
 
     return (
-        <group {...props} dispose={null}>
-            <ambientLight intensity={0.5} />
-            <group rotation={[-2.083, 0.146, 0.212]} scale={4.783}>
-                <mesh castShadow receiveShadow geometry={(nodes.Planeta009_09Sun_0 as Mesh).geometry} material={materials['09.Sun']} />
-                <mesh castShadow receiveShadow geometry={(nodes['Nubes001_09Nubes-atmosfera_-_Sun_0'] as Mesh).geometry} material={materials['09.Nubes-atmosfera_-_Sun']} rotation={[0.047, 0.234, -0.396]} scale={1.013} />
-                <Html className='absolute -bottom-16 -translate-x-1/2 transform'>
-                    <p className='text-gray-300 text-sm font-light tracking-widest'>SUN</p>
-                </Html>
+        <group ref={modelRef} scale={props.scale} position={props.position} rotation={props.rotation}>
+            <group rotation={[-Math.PI / 2, 0, 0]}>
+                <mesh castShadow receiveShadow geometry={(nodes.Object_2 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_3 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_4 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_5 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_6 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_7 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_8 as Mesh).geometry} material={materials.material} />
+                <mesh castShadow receiveShadow geometry={(nodes.Object_9 as Mesh).geometry} material={materials.material} />
             </group>
+            <EffectComposer>
+                <Bloom intensity={2} luminanceThreshold={0} luminanceSmoothing={0.9} />
+            </EffectComposer>
         </group>
     )
 }
 
-useGLTF.preload('/models/sun.glb')
+useGLTF.preload('/models/sun_model.glb')

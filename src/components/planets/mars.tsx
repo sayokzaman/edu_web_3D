@@ -1,49 +1,54 @@
 import { Html, useGLTF } from '@react-three/drei'
 import { Mesh } from 'three'
 import { useOrbit } from '../../hooks/useOrbit'
-
-type PlanetProps = {
-    scale?: number
-    position?: [number, number, number]
-    rotation?: [number, number, number]
-    onClick?: () => void
-    onPositionUpdate?: (position: [number, number, number], rotation: [number, number, number]) => void
-    isFollowing?: boolean
-}
+import { useFrame } from '@react-three/fiber'
+import { PlanetProps } from './types.planets'
 
 const Mars = (props: PlanetProps) => {
     const { nodes, materials } = useGLTF('/models/mars.glb')
 
     const { modelRef, isPaused, setIsPaused } = useOrbit({
-        semiMajorAxis: 15,
-        semiMinorAxis: 10,
-        speed: 0.15,
+        semiMajorAxis: props.orbitAxis ? props.orbitAxis[0] : 0,
+        semiMinorAxis: props.orbitAxis ? props.orbitAxis[1] : 0,
+        speed: 0.24 * 0.5,
         initialAngle: 20,
         pauseOnHover: true
+    })
+
+    useFrame(() => {
+        if (modelRef.current && props.onPositionUpdate) {
+            const position = modelRef.current.position
+            props.onPositionUpdate([position.x, position.y, position.z], 'mars')
+        }
     })
 
     return (
         <group
             ref={modelRef}
-            scale={isPaused ? [0.27, 0.27, 0.27] : [0.25, 0.25, 0.25]}
-            onPointerOver={() => setIsPaused(true)}
+            position={props.position}
+            onPointerOver={() => {
+                if (props.currentPlanet === 'mars') return
+                setIsPaused(true)
+            }}
             onPointerOut={() => {
+                if (props.currentPlanet === 'mars') return
                 setIsPaused(false)
             }}
-            {...props}
-            dispose={null}
-            rotation={[-1.413, 0, 0]}
+            onClick={() => {
+                setIsPaused(true)
+                props.onClick?.('mars')
+                setTimeout(() => {
+                    setIsPaused(false)
+                }, 1000)
+            }}
+            scale={isPaused ? [3.2, 3.2, 3.2] : [3, 3, 3]}
         >
-            <group rotation={[Math.PI / 2, 0, 0]}>
-                <group name='mars_1' rotation={[Math.PI, Math.PI / 2, 0]} scale={8}>
-                    <mesh name='Object_4' castShadow receiveShadow geometry={(nodes.Object_4 as Mesh).geometry} material={materials.mars} />
-                    {!props.isFollowing ? (
-                        <Html className='absolute -bottom-8 -translate-x-1/2 transform'>
-                            <p className='text-gray-300 text-sm font-light tracking-widest'>MARS</p>
-                        </Html>
-                    ) : null}
-                </group>
-            </group>
+            <mesh name='Object_4' castShadow receiveShadow geometry={(nodes.Object_4 as Mesh).geometry} material={materials.mars} />
+            {props.currentPlanet !== 'mars' ? (
+                <Html className='absolute -bottom-8 -translate-x-1/2 transform'>
+                    <p className='text-gray-300 text-sm font-light tracking-widest select-none'>MARS</p>
+                </Html>
+            ) : null}
         </group>
     )
 }
