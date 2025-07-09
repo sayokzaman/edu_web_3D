@@ -10,7 +10,7 @@ const Earth = (props: PlanetProps) => {
     const { modelRef, isPaused, setIsPaused } = useOrbit({
         semiMajorAxis: props.orbitAxis ? props.orbitAxis[0] : 0,
         semiMinorAxis: props.orbitAxis ? props.orbitAxis[1] : 0,
-        speed: 0.29 * 0.5,
+        speed: 0.29 * 0.2,
         initialAngle: 60,
         pauseOnHover: true
     })

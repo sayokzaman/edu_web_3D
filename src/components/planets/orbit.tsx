@@ -4,6 +4,7 @@ import { BufferAttribute, BufferGeometry, EllipseCurve } from 'three'
 type OrbitProps = {
     xAxis: number
     yAxis: number
+    color?: string
 }
 
 const Orbit = (props: OrbitProps) => {
@@ -35,7 +36,7 @@ const Orbit = (props: OrbitProps) => {
     return (
         <line>
             <bufferGeometry attach='geometry' {...pathGeometry} />
-            <lineDashedMaterial attach='material' color='#4f4f4f' linewidth={1} />
+            <lineDashedMaterial attach='material' color={props.color ? props.color : '#4f4f4f'} linewidth={1} />
         </line>
     )
 }

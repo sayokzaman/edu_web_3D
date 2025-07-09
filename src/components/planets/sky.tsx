@@ -1,5 +1,6 @@
 import { useGLTF } from '@react-three/drei'
-import { Mesh } from 'three'
+import { useRef } from 'react'
+import { Group, Mesh, DoubleSide, MeshStandardMaterial } from 'three'
 
 type PlanetProps = {
     scale?: number
@@ -8,14 +9,20 @@ type PlanetProps = {
 }
 
 export function Sky(props: PlanetProps) {
-    const { nodes, materials } = useGLTF('/models/sky.glb')
+    const { nodes, materials } = useGLTF('/models/star.glb') as unknown as {
+        nodes: { Sphere: Mesh }
+        materials: { ['Material.003']: MeshStandardMaterial }
+    }
+
+    const groupRef = useRef<Group>(null)
+
     return (
-        <group {...props} dispose={null}>
-            <group rotation={[-Math.PI / 2, 0, 0]} scale={500}>
-                <mesh castShadow receiveShadow geometry={(nodes.Object_4 as Mesh).geometry} material={materials.material} rotation={[Math.PI / 2, 0, 0]} />
-            </group>
+        <group ref={groupRef} rotation={[-Math.PI / 2, 0, 0]} scale={props.scale}>
+            <mesh geometry={nodes.Sphere.geometry} scale={500}>
+                <meshBasicMaterial map={materials['Material.003'].map} side={DoubleSide} />
+            </mesh>
         </group>
     )
 }
 
-useGLTF.preload('/models/sky.glb')
+useGLTF.preload('/models/star2.glb')

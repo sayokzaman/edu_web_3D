@@ -10,7 +10,7 @@ export function Venus(props: PlanetProps) {
     const { modelRef, isPaused, setIsPaused } = useOrbit({
         semiMajorAxis: props.orbitAxis ? props.orbitAxis[0] : 0,
         semiMinorAxis: props.orbitAxis ? props.orbitAxis[1] : 0,
-        speed: 0.35 * 0.5,
+        speed: 0.35 * 0.2,
         initialAngle: 40,
         pauseOnHover: true
     })
