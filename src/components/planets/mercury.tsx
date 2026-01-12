@@ -33,7 +33,7 @@ export function Mercury(props: PlanetProps) {
                 onPointerOver={() => {
                     if (props.currentPlanet === 'mercury') return
                     setIsPaused(true)
-                    setOrbitColor('#FFFFFF')
+                    setOrbitColor('#abc1de')
                 }}
                 onPointerOut={() => {
                     if (props.currentPlanet === 'mercury') return
@@ -56,7 +56,7 @@ export function Mercury(props: PlanetProps) {
                 ) : null}
             </group>
             <group
-                onPointerOver={() => setOrbitColor('#FFFFFF')}
+                onPointerOver={() => setOrbitColor('#abc1de')}
                 onPointerOut={() => setOrbitColor('#4f4f4f')}
                 onClick={() => {
                     setIsPaused(true)

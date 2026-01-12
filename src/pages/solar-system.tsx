@@ -4,7 +4,6 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import CanvasLoader from '../components/canvas-loader'
 import Earth from '../components/planets/earth'
 import { Sun } from '../components/planets/sun'
-import Orbit from '../components/planets/orbit'
 import { PerspectiveCamera as Camera, Vector3 } from 'three'
 import { CameraController } from '../components/camera-controller'
 import { Sky } from '../components/planets/sky'
@@ -153,27 +152,22 @@ const SolarSystem = () => {
 
                 <>
                     <Venus orbitAxis={[22, 20]} position={planetsPosition.venus} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
-                    <Orbit xAxis={22} yAxis={20} />
                 </>
 
                 <>
                     <Earth orbitAxis={[32, 30]} position={planetsPosition.earth} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
-                    <Orbit xAxis={32} yAxis={30} />
                 </>
 
                 <>
                     <Mars orbitAxis={[50, 47]} position={planetsPosition.mars} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
-                    <Orbit xAxis={50} yAxis={47} />
                 </>
 
                 <>
                     <Jupiter orbitAxis={[70, 63]} position={planetsPosition.jupiter} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
-                    <Orbit xAxis={70} yAxis={63} />
                 </>
 
                 <>
                     <Saturn orbitAxis={[85, 80]} position={planetsPosition.saturn} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
-                    <Orbit xAxis={85} yAxis={80} />
                 </>
 
                 <ambientLight intensity={0.2} />

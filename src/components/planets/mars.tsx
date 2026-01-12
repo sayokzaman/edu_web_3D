@@ -3,6 +3,8 @@ import { Mesh } from 'three'
 import { useOrbit } from '../../hooks/useOrbit'
 import { useFrame } from '@react-three/fiber'
 import { PlanetProps } from './types.planets'
+import Orbit from './orbit'
+import { useState } from 'react'
 
 const Mars = (props: PlanetProps) => {
     const { nodes, materials } = useGLTF('/models/mars.glb')
@@ -22,34 +24,51 @@ const Mars = (props: PlanetProps) => {
         }
     })
 
+    const [orbitColor, setOrbitColor] = useState('#4f4f4f')
+
     return (
-        <group
-            ref={modelRef}
-            position={props.position}
-            onPointerOver={() => {
-                if (props.currentPlanet === 'mars') return
-                setIsPaused(true)
-            }}
-            onPointerOut={() => {
-                if (props.currentPlanet === 'mars') return
-                setIsPaused(false)
-            }}
-            onClick={() => {
-                setIsPaused(true)
-                props.onClick?.('mars')
-                setTimeout(() => {
+        <>
+            <group
+                ref={modelRef}
+                position={props.position}
+                onPointerOver={() => {
+                    if (props.currentPlanet === 'mars') return
+                    setIsPaused(true)
+                }}
+                onPointerOut={() => {
+                    if (props.currentPlanet === 'mars') return
                     setIsPaused(false)
-                }, 1000)
-            }}
-            scale={isPaused ? [3.2, 3.2, 3.2] : [3, 3, 3]}
-        >
-            <mesh name='Object_4' castShadow receiveShadow geometry={(nodes.Object_4 as Mesh).geometry} material={materials.mars} />
-            {props.currentPlanet !== 'mars' ? (
-                <Html className='absolute -bottom-8 -translate-x-1/2 transform'>
-                    <p className='text-gray-300 text-sm font-light tracking-widest select-none'>MARS</p>
-                </Html>
-            ) : null}
-        </group>
+                }}
+                onClick={() => {
+                    setIsPaused(true)
+                    props.onClick?.('mars')
+                    setTimeout(() => {
+                        setIsPaused(false)
+                    }, 1000)
+                }}
+                scale={isPaused ? [3.2, 3.2, 3.2] : [3, 3, 3]}
+            >
+                <mesh name='Object_4' castShadow receiveShadow geometry={(nodes.Object_4 as Mesh).geometry} material={materials.mars} />
+                {props.currentPlanet !== 'mars' ? (
+                    <Html className='absolute -bottom-8 -translate-x-1/2 transform'>
+                        <p className='text-gray-300 text-sm font-light tracking-widest select-none'>MARS</p>
+                    </Html>
+                ) : null}
+            </group>
+            <group
+                onPointerOver={() => setOrbitColor('#abc1de')}
+                onPointerOut={() => setOrbitColor('#4f4f4f')}
+                onClick={() => {
+                    setIsPaused(true)
+                    props.onClick?.('mars')
+                    setTimeout(() => {
+                        setIsPaused(false)
+                    }, 1000)
+                }}
+            >
+                <Orbit xAxis={50} yAxis={47} color={orbitColor} />
+            </group>
+        </>
     )
 }
 

@@ -3,6 +3,8 @@ import { Mesh } from 'three'
 import { PlanetProps } from './types.planets'
 import { useFrame } from '@react-three/fiber'
 import { useOrbit } from '../../hooks/useOrbit'
+import Orbit from './orbit'
+import { useState } from 'react'
 
 export function Jupiter(props: PlanetProps) {
     const { nodes, materials } = useGLTF('/models/jupiter.glb')
@@ -21,35 +23,54 @@ export function Jupiter(props: PlanetProps) {
         }
     })
 
+    const [orbitColor, setOrbitColor] = useState('#4f4f4f')
+
     return (
-        <group
-            scale={isPaused ? [0.031, 0.031, 0.031] : [0.03, 0.03, 0.03]}
-            ref={modelRef}
-            position={props.position}
-            onPointerOver={() => {
-                if (props.currentPlanet === 'jupiter') return
-                setIsPaused(true)
-            }}
-            onPointerOut={() => {
-                if (props.currentPlanet === 'jupiter') return
-                setIsPaused(false)
-            }}
-            onClick={() => {
-                setIsPaused(true)
-                props.onClick?.('jupiter')
-                setTimeout(() => {
+        <>
+            <group
+                scale={isPaused ? [0.031, 0.031, 0.031] : [0.03, 0.03, 0.03]}
+                ref={modelRef}
+                position={props.position}
+                onPointerOver={() => {
+                    if (props.currentPlanet === 'jupiter') return
+                    setIsPaused(true)
+                    setOrbitColor('#abc1de')
+                }}
+                onPointerOut={() => {
+                    if (props.currentPlanet === 'jupiter') return
                     setIsPaused(false)
-                }, 1000)
-            }}
-            dispose={null}
-        >
-            <mesh castShadow receiveShadow geometry={(nodes.Sphere_Material_0 as Mesh).geometry} material={materials.Material} rotation={[-Math.PI / 2, 0, 0]} />
-            {props.currentPlanet !== 'jupiter' ? (
-                <Html className='absolute -bottom-12 -translate-x-1/2 transform'>
-                    <p className='text-gray-300 text-sm font-light tracking-widest select-none'>JUPITER</p>
-                </Html>
-            ) : null}
-        </group>
+                    setOrbitColor('#4f4f4f')
+                }}
+                onClick={() => {
+                    setIsPaused(true)
+                    props.onClick?.('jupiter')
+                    setTimeout(() => {
+                        setIsPaused(false)
+                    }, 1000)
+                }}
+                dispose={null}
+            >
+                <mesh castShadow receiveShadow geometry={(nodes.Sphere_Material_0 as Mesh).geometry} material={materials.Material} rotation={[-Math.PI / 2, 0, 0]} />
+                {props.currentPlanet !== 'jupiter' ? (
+                    <Html className='absolute -bottom-12 -translate-x-1/2 transform'>
+                        <p className='text-gray-300 text-sm font-light tracking-widest select-none'>JUPITER</p>
+                    </Html>
+                ) : null}
+            </group>
+            <group
+                onPointerOver={() => setOrbitColor('#abc1de')}
+                onPointerOut={() => setOrbitColor('#4f4f4f')}
+                onClick={() => {
+                    setIsPaused(true)
+                    props.onClick?.('jupiter')
+                    setTimeout(() => {
+                        setIsPaused(false)
+                    }, 1000)
+                }}
+            >
+                <Orbit xAxis={70} yAxis={63} color={orbitColor} />
+            </group>
+        </>
     )
 }
 
