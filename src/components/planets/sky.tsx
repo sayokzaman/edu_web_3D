@@ -25,4 +25,4 @@ export function Sky(props: PlanetProps) {
     )
 }
 
-useGLTF.preload('/models/star2.glb')
+useGLTF.preload('/models/star.glb')
