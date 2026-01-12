@@ -3,8 +3,9 @@ import SolarSystem from './pages/solar-system'
 import ScalesPage from './pages/scales-page'
 
 function App() {
+    const basename = import.meta.env.PROD ? '/edu_web_3D' : '/'
     return (
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
             <Routes>
                 <Route path='/' element={<SolarSystem />} />
 
