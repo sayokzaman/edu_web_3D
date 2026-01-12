@@ -7,4 +7,7 @@ import wasm from 'vite-plugin-wasm'
 export default defineConfig({
     plugins: [react(), tailwindcss(), wasm()],
     base: process.env.VITE_BASE_PATH || '/edu_web_3D',
+    build: {
+        target: 'ES2022'
+    }
 })
