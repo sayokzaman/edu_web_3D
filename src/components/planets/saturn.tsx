@@ -78,7 +78,7 @@ const Saturn = (props: PlanetProps) => {
                     }, 1000)
                 }}
             >
-                <Orbit xAxis={85} yAxis={80} color={orbitColor} />
+                <Orbit xAxis={props.orbitAxis ? props.orbitAxis[0] : 0} yAxis={props.orbitAxis ? props.orbitAxis[1] : 0} color={orbitColor} />
             </group>
         </>
     )

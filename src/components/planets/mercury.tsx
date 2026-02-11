@@ -66,7 +66,7 @@ export function Mercury(props: PlanetProps) {
                     }, 1000)
                 }}
             >
-                <Orbit xAxis={15} yAxis={15} color={orbitColor} />
+                <Orbit xAxis={props.orbitAxis ? props.orbitAxis[0] : 0} yAxis={props.orbitAxis ? props.orbitAxis[1] : 0} color={orbitColor} />
             </group>
         </>
     )

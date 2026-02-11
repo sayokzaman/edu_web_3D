@@ -1,1 +1,71 @@
 @import 'tailwindcss';
+
+/* Custom modern scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(24, 24, 27, 0.5);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #06b6d4, #3b82f6);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #22d3ee, #60a5fa);
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #06b6d4 rgba(24, 24, 27, 0.5);
+}
+
+@keyframes fade-up {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-fade-up {
+    animation: fade-up 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.animate-fade-up-delayed {
+    animation: fade-up 900ms cubic-bezier(0.2, 0.7, 0.2, 1) 150ms both;
+}
+
+.gradient-shimmer {
+    background-size: 200% 200%;
+    animation: gradient-shift 6s ease infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-fade-up-delayed,
+    .gradient-shimmer {
+        animation: none;
+    }
+}

@@ -12,6 +12,7 @@ import { Mercury } from '../components/planets/mercury'
 import { Jupiter } from '../components/planets/jupiter'
 import { Venus } from '../components/planets/venus'
 import Saturn from '../components/planets/saturn'
+import { planetsData } from '../data/planet-info'
 
 const SolarSystem = () => {
     const [planetsPosition, setPlanetsPosition] = useState<{ [key: string]: [number, number, number] }>({
@@ -131,6 +132,8 @@ const SolarSystem = () => {
         setPlanetsPosition(prev => ({ ...prev, [name]: position }))
     }
 
+    const selectedPlanetInfo = currentPlanet ? planetsData[currentPlanet] : null
+
     return (
         <div className='relative h-screen w-screen bg-gray-900'>
             <Canvas onClick={handleCanvasClick}>
@@ -140,7 +143,7 @@ const SolarSystem = () => {
 
                 <CameraController cameraRef={cameraRef} controlsRef={controlsRef} targetPosition={currentPlanet ? planetsPosition[currentPlanet] : defaultCameraPosition} isFollowing={isFollowing} isAnimating={isAnimating} currentPlanet={currentPlanet} />
 
-                <OrbitControls ref={controlsRef} enableZoom enablePan={false} maxDistance={450} />
+                <OrbitControls ref={controlsRef} enableZoom enablePan={false} maxDistance={450} minDistance={currentPlanet ? 0 : 15} />
 
                 <Sky />
 
@@ -163,17 +166,102 @@ const SolarSystem = () => {
                 </>
 
                 <>
-                    <Jupiter orbitAxis={[70, 63]} position={planetsPosition.jupiter} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Jupiter orbitAxis={[140, 120]} position={planetsPosition.jupiter} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
                 </>
 
                 <>
-                    <Saturn orbitAxis={[85, 80]} position={planetsPosition.saturn} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
+                    <Saturn orbitAxis={[170, 160]} position={planetsPosition.saturn} onClick={handlePlanetClick} onPositionUpdate={updatePlanetsPosition} currentPlanet={currentPlanet} />
                 </>
 
                 <ambientLight intensity={0.2} />
                 <pointLight position={[0, 0, 0]} intensity={2000} />
             </Canvas>
-            {/* <div className='absolute top-0 right-0 w-64 bg-white'>asd</div> */}
+
+            {/* Planet Name Display - Top Left */}
+            {selectedPlanetInfo && (
+                <div className='absolute top-8 left-8 bg-zinc-900/90 backdrop-blur-md border border-cyan-500/50 rounded-lg px-6 py-4 shadow-2xl'>
+                    <h2 className='text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text'>{selectedPlanetInfo.displayName}</h2>
+                    <p className='text-sm text-gray-400 mt-1'>{selectedPlanetInfo.type}</p>
+                </div>
+            )}
+
+            {/* Information Sidebar - Right */}
+            {selectedPlanetInfo && (
+                <div className='absolute top-1/2 -translate-y-1/2 right-2 h-[calc(100vh-72px)] w-96 bg-zinc-900/95 backdrop-blur-md shadow-2xl overflow-y-auto z-50 rounded-xl border border-cyan-500/30'>
+                    <div className='p-6'>
+                        {/* Close Button */}
+                        <button onClick={() => handleCanvasClick()} className='absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-cyan-500/20 border border-zinc-700 hover:border-cyan-500 transition-all duration-200 text-gray-400 hover:text-cyan-400'>
+                            ✕
+                        </button>
+
+                        {/* Header */}
+                        <div className='mb-6'>
+                            <h3 className='text-2xl font-bold text-white mb-2'>{selectedPlanetInfo.displayName}</h3>
+                            <div className='h-1 w-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full'></div>
+                        </div>
+
+                        {/* Description */}
+                        <div className='mb-6'>
+                            <p className='text-gray-300 leading-relaxed'>{selectedPlanetInfo.description}</p>
+                        </div>
+
+                        {/* Planet Stats */}
+                        <div className='space-y-4 mb-6'>
+                            <h4 className='text-lg font-semibold text-cyan-400 mb-3'>Quick Facts</h4>
+
+                            <div className='grid gap-3 grid-cols-2'>
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Diameter</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.diameter}</div>
+                                </div>
+
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Mass</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.mass}</div>
+                                </div>
+
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Distance from Sun</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.distanceFromSun}</div>
+                                </div>
+
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Orbital Period</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.orbitalPeriod}</div>
+                                </div>
+
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Rotation Period</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.rotationPeriod}</div>
+                                </div>
+
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Temperature</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.temperature}</div>
+                                </div>
+
+                                <div className='bg-zinc-800/50 rounded-lg p-3 border border-zinc-800'>
+                                    <div className='text-xs text-gray-500 mb-1'>Moons</div>
+                                    <div className='text-white font-medium'>{selectedPlanetInfo.moons}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Interesting Facts */}
+                        <div>
+                            <h4 className='text-lg font-semibold text-cyan-400 mb-3'>Did You Know?</h4>
+                            <ul className='space-y-2'>
+                                {selectedPlanetInfo.facts.map((fact, index) => (
+                                    <li key={index} className='flex items-start'>
+                                        <span className='text-cyan-500 mr-2 mt-1'>•</span>
+                                        <span className='text-gray-300 text-sm'>{fact}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -66,7 +66,7 @@ const Mars = (props: PlanetProps) => {
                     }, 1000)
                 }}
             >
-                <Orbit xAxis={50} yAxis={47} color={orbitColor} />
+                <Orbit xAxis={props.orbitAxis ? props.orbitAxis[0] : 0} yAxis={props.orbitAxis ? props.orbitAxis[1] : 0} color={orbitColor} />
             </group>
         </>
     )

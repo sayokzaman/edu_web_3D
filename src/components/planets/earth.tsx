@@ -67,7 +67,7 @@ const Earth = (props: PlanetProps) => {
                     }, 1000)
                 }}
             >
-                <Orbit xAxis={32} yAxis={30} color={orbitColor} />
+                <Orbit xAxis={props.orbitAxis ? props.orbitAxis[0] : 0} yAxis={props.orbitAxis ? props.orbitAxis[1] : 0} color={orbitColor} />
             </group>
         </>
     )
